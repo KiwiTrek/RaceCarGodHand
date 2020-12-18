@@ -21,6 +21,7 @@ ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(ap
 	playerDistance = 15.0f;
 	playerVerticalAngle = 30.0f;
 	//playerHorizontalAngle = 0.0;
+    lookBack = false;
 }
 
 ModuleCamera3D::~ModuleCamera3D()
@@ -52,7 +53,7 @@ update_status ModuleCamera3D::Update(float dt)
 		{
 		case CameraType::NORMAL:
 			cameraType = CameraType::EAGLE;
-			Position = { 0,50,100 };
+			Position = { 0,150,200 };
 			LookAt({ 0,0,0 });
 			break;
 		case CameraType::EAGLE:
@@ -72,6 +73,7 @@ update_status ModuleCamera3D::Update(float dt)
 	// Now we can make this movememnt frame rate independant!
 	//LOG("%f %f %f", Position.x, Position.y, Position.z);
 	vec3 newPos(0, 0, 0);
+    lookBack = false;
 	switch (cameraType)
 	{
 		case CameraType::NORMAL:
@@ -81,11 +83,15 @@ update_status ModuleCamera3D::Update(float dt)
 			if (App->input->GetMouseZ() < 0) playerDistance += zoomSpeed;
 			if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 			{
-				playerVerticalAngle = playerVerticalAngle - (App->input->GetMouseXMotion() * 0.25f);
+				playerVerticalAngle = playerVerticalAngle - (App->input->GetMouseYMotion() * 0.25f);
 				//playerHorizontalAngle = playerHorizontalAngle - (App->input->GetMouseYMotion() * 0.25f);
 			}
+            if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
+            {
+                lookBack = true;
+            }
 
-			FollowPlayer();
+			FollowPlayer(lookBack);
 
 			break;
 		}
@@ -206,7 +212,7 @@ void ModuleCamera3D::CalculateViewMatrix()
 	ViewMatrixInverse = inverse(ViewMatrix);
 }
 
-void ModuleCamera3D::FollowPlayer()
+void ModuleCamera3D::FollowPlayer(bool lookBack)
 {
 	// Move position of camera reference frame to player's CM
 	Reference = { App->player->GetX(), App->player->GetY(), App->player->GetZ() };
@@ -224,9 +230,12 @@ void ModuleCamera3D::FollowPlayer()
 	// WE ONLY ROTATE ALONG THE Y axis (Vertical axis) so that the camera remains horizontal at this point
 
 	// Rotate camera, since car orientation is reversed
-	X = rotate(X, 180.0f, vec3(0.0f, 1.0f, 0.0f));
-	Y = rotate(Y, 180.0f, vec3(0.0f, 1.0f, 0.0f));
-	Z = rotate(Z, 180.0f, vec3(0.0f, 1.0f, 0.0f));
+    if (lookBack == false)
+    {
+        X = rotate(X, 180.0f, vec3(0.0f, 1.0f, 0.0f));
+        Y = rotate(Y, 180.0f, vec3(0.0f, 1.0f, 0.0f));
+        Z = rotate(Z, 180.0f, vec3(0.0f, 1.0f, 0.0f));
+    }
 
 	//// Rotate camera following Y axis (User Input)
 	//X = rotate(X, playerHorizontalAngle, vec3(0.0f, 1.0f, 0.0f));

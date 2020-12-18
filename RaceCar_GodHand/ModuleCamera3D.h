@@ -25,7 +25,7 @@ public:
 
 	void Look(const vec3 &Position, const vec3 &Reference, bool RotateAroundReference = false);
 	void LookAt(const vec3 &Spot);
-	void FollowPlayer();
+	void FollowPlayer(bool lookBack);
 	void Move(const vec3 &Movement);
 	float* GetViewMatrix();
 	vec3 ToEulerAngles(btQuaternion q);
@@ -40,6 +40,7 @@ public:
 	float playerDistance;
 	float playerVerticalAngle;
 	/*float playerHorizontalAngle;*/
+    bool lookBack;
 
 	//Player Camera
 	CameraType cameraType;

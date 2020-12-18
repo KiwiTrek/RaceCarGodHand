@@ -4,7 +4,7 @@
 #include "Globals.h"
 #include "Primitive.h"
 
-#define MAX_SNAKE 2
+#define MAX_ELEMENTS 1024
 
 struct PhysBody3D;
 struct PhysMotor3D;
@@ -17,6 +17,7 @@ public:
 
 	bool Start();
 	update_status Update(float dt);
+    update_status PostUpdate();
 	bool CleanUp();
 
 	void OnCollision(PhysBody3D* body1, PhysBody3D* body2);
@@ -29,6 +30,9 @@ public:
 	PhysBody3D* pb_snake2[MAX_SNAKE];
 	Sphere s_snake2[MAX_SNAKE];
 	*/
+
+    PhysBody3D* pb_circuit[MAX_ELEMENTS];
+    p2DynArray<Primitive*> c_circuit;
 
 	PhysBody3D* pb_chassis;
 	Cube p_chassis;
