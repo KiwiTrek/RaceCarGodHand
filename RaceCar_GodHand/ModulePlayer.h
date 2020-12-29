@@ -5,7 +5,8 @@
 
 struct PhysVehicle3D;
 
-#define MAX_ACCELERATION 1000.0f
+#define MAX_ACCELERATION 750.0f
+#define MAX_BACKWARDS_ACCELERATION -375.0f
 #define TURN_DEGREES 15.0f * DEGTORAD
 #define BRAKE_POWER 1000.0f
 
@@ -26,6 +27,7 @@ public:
 
 public:
 	PhysVehicle3D* vehicle;
+	btTransform initialPos;
 	float turn;
 	float acceleration;
 	float brake;

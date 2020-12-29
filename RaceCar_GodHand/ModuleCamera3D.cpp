@@ -32,7 +32,7 @@ bool ModuleCamera3D::Start()
 {
 	LOG("Setting up the camera");
 	bool ret = true;
-
+	cameraType = CameraType::EAGLE;
 	return ret;
 }
 
@@ -98,17 +98,17 @@ update_status ModuleCamera3D::Update(float dt)
 		case CameraType::DEBUG:
 		{
 			float speed = 3.0f * dt;
-			if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
+			if (App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
 				speed = 8.0f * dt;
 
-			if (App->input->GetKey(SDL_SCANCODE_R) == KEY_REPEAT) newPos.y += speed;
-			if (App->input->GetKey(SDL_SCANCODE_F) == KEY_REPEAT) newPos.y -= speed;
+			if (App->input->GetKey(SDL_SCANCODE_COMMA) == KEY_REPEAT) newPos.y += speed;
+			if (App->input->GetKey(SDL_SCANCODE_PERIOD) == KEY_REPEAT) newPos.y -= speed;
 
-			if (App->input->GetKey(SDL_SCANCODE_Y) == KEY_REPEAT) newPos -= Z * speed;
-			if (App->input->GetKey(SDL_SCANCODE_H) == KEY_REPEAT) newPos += Z * speed;
+			if (App->input->GetKey(SDL_SCANCODE_UP) == KEY_REPEAT) newPos -= Z * speed;
+			if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT) newPos += Z * speed;
 
-			if (App->input->GetKey(SDL_SCANCODE_G) == KEY_REPEAT) newPos -= X * speed;
-			if (App->input->GetKey(SDL_SCANCODE_J) == KEY_REPEAT) newPos += X * speed;
+			if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT) newPos -= X * speed;
+			if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT) newPos += X * speed;
 
 			if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
 			{
@@ -146,6 +146,11 @@ update_status ModuleCamera3D::Update(float dt)
 			}
 
 			break;
+		}
+		case CameraType::EAGLE:
+		{
+			Position = { 0,150,200 };
+			LookAt({ 0,0,0 });
 		}
 	}
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.h"
 #include "p2DynArray.h"
+#include "p2Point.h"
 #include "Globals.h"
 #include "Primitive.h"
 
@@ -8,6 +9,24 @@
 
 struct PhysBody3D;
 struct PhysMotor3D;
+
+// FROM EAGLE CAM POV
+enum class CurveType
+{
+	BOTTOM_RIGHT,
+	BOTTOM_LEFT,
+	TOP_LEFT,
+	TOP_RIGHT
+};
+
+// FROM EAGLE CAM POV
+enum class RoadType
+{
+	HORIZONTAL_LEFT,
+	HORIZONTAL_RIGHT,
+	VERTICAL_UP,
+	VERTICAL_DOWN
+};
 
 class ModuleSceneIntro : public Module
 {
@@ -20,6 +39,11 @@ public:
     update_status PostUpdate();
 	bool CleanUp();
 
+	void BuildCircuit();
+	void CreateCurve(p2Point<float> circleCenter, float radious, float referenceAngle, float sizePilon, float heightPilon, int numPilons, float pilonDistance, CurveType type);
+	float CreateRoad(p2Point<float> init, float sizePilon, float heightPilon, int numPilons, float pilonDistance, float halfRoad, RoadType type);
+	void CreateRamp(p2Point<float> position, float height, float length, float angle, RoadType type);
+
 	void OnCollision(PhysBody3D* body1, PhysBody3D* body2);
 
 public:
@@ -31,7 +55,6 @@ public:
 	Sphere s_snake2[MAX_SNAKE];
 	*/
 
-    PhysBody3D* pb_circuit[MAX_ELEMENTS];
     p2DynArray<Primitive*> c_circuit;
 
 	PhysBody3D* pb_chassis;
