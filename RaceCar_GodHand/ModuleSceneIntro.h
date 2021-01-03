@@ -43,6 +43,7 @@ public:
 	void CreateCurve(p2Point<float> circleCenter, float radious, float referenceAngle, float sizePilon, float heightPilon, int numPilons, float pilonDistance, CurveType type);
 	float CreateRoad(p2Point<float> init, float sizePilon, float heightPilon, int numPilons, float pilonDistance, float halfRoad, RoadType type);
 	void CreateRamp(p2Point<float> position, float height, float length, float angle, RoadType type);
+	void CreateBorders();
 
 	void OnCollision(PhysBody3D* body1, PhysBody3D* body2);
 

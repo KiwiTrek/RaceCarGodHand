@@ -20,7 +20,7 @@ bool ModuleSceneIntro::Start()
 
     BuildCircuit();
 
-	App->camera->Move(vec3(10.0f, 10.0f, 0.0f));
+	App->camera->Position = { 0,150,200 };
 	App->camera->LookAt(vec3(0, 0, 0));
 
 	return ret;
@@ -176,6 +176,36 @@ void ModuleSceneIntro::BuildCircuit()
     roadPosition.x = 115.0f;
     roadPosition.y = 33.25f;
     previousRoadPos = CreateRoad(roadPosition, size, height, 9, pilonDistance, halfRoad, RoadType::VERTICAL_DOWN);
+
+    CreateBorders();
+}
+
+void ModuleSceneIntro::CreateBorders()
+{
+    Cube* border1 = new Cube(400.0f, 500.0f, 1.0f);
+    c_circuit.PushBack(border1);
+    border1->SetPos(0.0f, 250.0f, 200.0f);
+    border1->color = { 0.67f, 0.84f, 0.9f, 1.0f };
+
+    Cube* border2 = new Cube(400.0f, 500.0f, 1.0f);
+    c_circuit.PushBack(border2);
+    border2->SetPos(0.0f, 250.0f, -200.0f);
+    border2->color = { 0.67f, 0.84f, 0.9f, 1.0f };
+
+    Cube* border3 = new Cube(1.0f, 500.0f, 400.0f);
+    c_circuit.PushBack(border3);
+    border3->SetPos(200.0f, 250.0f, 0.0f);
+    border3->color = { 0.67f, 0.84f, 0.9f, 1.0f };
+
+    Cube* border4 = new Cube(1.0f, 500.0f, 400.0f);
+    c_circuit.PushBack(border4);
+    border4->SetPos(-200.0f, 250.0f, 0.0f);
+    border4->color = { 0.67f, 0.84f, 0.9f, 1.0f };
+
+    Cube* floor = new Cube(400.0f, 1.0f, 400.0f);
+    c_circuit.PushBack(floor);
+    floor->SetPos(0.0f, 0.0f, 0.0f);
+    floor->color = { 0.56f, 0.93f, 0.56f, 1.0f };
 }
 
 float ModuleSceneIntro::CreateRoad(p2Point<float> init, float sizePilon, float heightPilon, int numPilons, float pilonDistance, float halfRoad, RoadType type)
