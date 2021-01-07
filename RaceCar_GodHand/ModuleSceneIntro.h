@@ -35,6 +35,7 @@ public:
 	~ModuleSceneIntro();
 
 	bool Start();
+	void Reset();
 	update_status Update(float dt);
     update_status PostUpdate();
 	bool CleanUp();
@@ -48,13 +49,12 @@ public:
 	void OnCollision(PhysBody3D* body1, PhysBody3D* body2);
 
 public:
-	/*
-	PhysBody3D* pb_snake[MAX_SNAKE];
-	Sphere s_snake[MAX_SNAKE];
-
-	PhysBody3D* pb_snake2[MAX_SNAKE];
-	Sphere s_snake2[MAX_SNAKE];
-	*/
+	bool start;
+	bool onceMusic;
+	bool onceMusicIntro;
+	int lapCounter;
+	int maxLaps;
+	float timer;
 
     p2DynArray<Primitive*> c_circuit;
 

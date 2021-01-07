@@ -25,6 +25,8 @@ public:
 	float GetZ();
 	btQuaternion GetRotationQuaternion();
 
+	void ResetPosition();
+
 public:
 	PhysVehicle3D* vehicle;
 	btTransform initialPos;
@@ -32,4 +34,7 @@ public:
 	float acceleration;
 	float brake;
 	float timer;
+
+	bool victory;
+	bool lose;
 };

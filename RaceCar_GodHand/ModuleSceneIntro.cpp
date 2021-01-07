@@ -4,6 +4,9 @@
 #include "ModulePhysics3D.h"
 #include "Primitive.h"
 #include "PhysBody3D.h"
+#include "PhysVehicle3D.h"
+
+#include "ModulePlayer.h"
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -22,6 +25,14 @@ bool ModuleSceneIntro::Start()
 
 	App->camera->Position = { 0,150,200 };
 	App->camera->LookAt(vec3(0, 0, 0));
+
+    timer = 0.0f;
+    start = true;
+    onceMusic = true;
+    onceMusicIntro = true;
+
+    lapCounter = 0;
+    maxLaps = 0;
 
 	return ret;
 }
@@ -42,9 +53,66 @@ update_status ModuleSceneIntro::Update(float dt)
     p.axis = true;
     p.Render();
 
+    if (start)
+    {
+        App->camera->Position = { 0,150,200 };
+        App->camera->LookAt(vec3(0, 0, 0));
+
+        if (onceMusicIntro)
+        {
+            App->audio->PlayMusic("Assets/Music/title.ogg",-1,0.0f);
+            onceMusicIntro = false;
+        }
+    }
+
+    if (App->input->GetKey(SDL_SCANCODE_RETURN) == KEY_DOWN)
+    {
+        start = false;
+    }
+
     for (uint n = 0; n < c_circuit.Count(); n++)
     {
         c_circuit[n]->Render();
+    }
+
+    if (start)
+    {
+        App->window->SetTitle("God Hand's RACECAR! Press Enter to play.");
+    }
+    else if (!App->player->victory && !App->player->lose)
+    {
+        App->camera->cameraType = CameraType::NORMAL;
+        if (onceMusic)
+        {
+            App->audio->PlayMusic("Assets/Music/game.ogg");
+            onceMusic = false;
+        }
+        timer += dt;
+        char title[80];
+        sprintf_s(title, "Laps: %d / %d, Timer:%.1f, Velocity: %.1f Km/h", lapCounter, maxLaps, timer, App->player->vehicle->GetKmh());
+        App->window->SetTitle(title);
+    }
+
+    if (!start && (App->player->victory || App->player->lose))
+    {
+        if (App->audio->HasFinished())
+        {
+            App->audio->PlayMusic("Assets/Music/victoryLooped.ogg");
+        }
+        char title[80];
+        if (App->player->victory)
+        {
+            sprintf_s(title, "You win! Your time has been %.1f. Press R to restart!", timer, App->player->vehicle->GetKmh());
+        }
+        else if (App->player->lose)
+        {
+            sprintf_s(title, "You lose... Your time has been %.1f. Press R to restart!", timer, App->player->vehicle->GetKmh());
+        }
+        App->window->SetTitle(title);
+        if (App->input->GetKey(SDL_SCANCODE_R) == KEY_DOWN)
+        {
+            Reset();
+        }
     }
 
 	return UPDATE_CONTINUE;
@@ -52,6 +120,19 @@ update_status ModuleSceneIntro::Update(float dt)
 
 void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
 {
+}
+
+void ModuleSceneIntro::Reset()
+{
+    start = true;
+    onceMusicIntro = true;
+    timer = 0.0f;
+    onceMusic = true;
+    lapCounter = 0;
+    maxLaps = 0;
+    App->player->victory = false;
+    App->player->lose = false;
+    App->player->ResetPosition();
 }
 
 void ModuleSceneIntro::BuildCircuit()
@@ -204,7 +285,7 @@ void ModuleSceneIntro::CreateBorders()
 
     Cube* floor = new Cube(400.0f, 1.0f, 400.0f);
     c_circuit.PushBack(floor);
-    floor->SetPos(0.0f, 0.0f, 0.0f);
+    floor->SetPos(0.0f, -1.0f, 0.0f);
     floor->color = { 0.56f, 0.93f, 0.56f, 1.0f };
 }
 

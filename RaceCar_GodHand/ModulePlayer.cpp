@@ -5,6 +5,9 @@
 #include "PhysVehicle3D.h"
 #include "PhysBody3D.h"
 
+#include "ModuleAudio.h"
+#include "ModuleSceneIntro.h"
+
 ModulePlayer::ModulePlayer(Application* app, bool start_enabled) : Module(app, start_enabled), vehicle(NULL)
 {
 	turn = acceleration = brake = 0.0f;
@@ -97,7 +100,11 @@ bool ModulePlayer::Start()
     car.wheels[3].steering = false;
 
     vehicle = App->physics->AddVehicle(car);
-    vehicle->SetPos(115, 0, 45);
+    ResetPosition();
+
+    victory = false;
+    lose = false;
+
     return true;
 }
 
@@ -112,112 +119,137 @@ bool ModulePlayer::CleanUp()
 // Update: draw background
 update_status ModulePlayer::Update(float dt)
 {
+    bool debugReset = false;
 	turn = acceleration = brake = 0.0f;
 
-	if(App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
-	{
-        if (vehicle->GetKmh() < 0.0)
+    if (!App->scene_intro->start)
+    {
+        if (!victory && !lose)
         {
-            brake = BRAKE_POWER;
-        }
-        if (vehicle->GetKmh() <= 75.0f && App->input->GetKey(SDL_SCANCODE_LCTRL) != KEY_REPEAT);
-        {
-            acceleration = MAX_ACCELERATION;
-        }
-	}
-
-	if(App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
-	{
-		if(turn < TURN_DEGREES)
-			turn +=  TURN_DEGREES;
-	}
-
-	if(App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
-	{
-		if(turn > -TURN_DEGREES)
-			turn -= TURN_DEGREES;
-	}
-
-	if(App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
-	{
-		brake = BRAKE_POWER;
-        if (vehicle->GetKmh() <= 1.0f)
-        {
-            brake = 0.0f;
-            if (vehicle->GetKmh() >= -25.0f)
+            if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
             {
-                acceleration = MAX_BACKWARDS_ACCELERATION;
+                if (vehicle->GetKmh() < 0.0)
+                {
+                    brake = BRAKE_POWER;
+                }
+                if (vehicle->GetKmh() <= 75.0f && App->input->GetKey(SDL_SCANCODE_LCTRL) != KEY_REPEAT);
+                {
+                    acceleration = MAX_ACCELERATION;
+                }
+            }
+
+            if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+            {
+                if (turn < TURN_DEGREES)
+                    turn += TURN_DEGREES;
+            }
+
+            if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+            {
+                if (turn > -TURN_DEGREES)
+                    turn -= TURN_DEGREES;
+            }
+
+            if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
+            {
+                brake = BRAKE_POWER;
+                if (vehicle->GetKmh() <= 1.0f)
+                {
+                    brake = 0.0f;
+                    if (vehicle->GetKmh() >= -25.0f)
+                    {
+                        acceleration = MAX_BACKWARDS_ACCELERATION;
+                    }
+                }
+            }
+
+            if (App->input->GetKey(SDL_SCANCODE_F3) == KEY_DOWN)
+            {
+                ResetPosition();
+                vehicle->Brake(1000.f);
+                debugReset = true;
+            }
+
+            if (App->input->GetKey(SDL_SCANCODE_F10) == KEY_DOWN)
+            {
+                victory = true;
+                App->audio->PlayMusic("Assets/Music/victory.ogg", 0, 0.0f);
+            }
+            if (App->input->GetKey(SDL_SCANCODE_F11) == KEY_DOWN)
+            {
+                lose = true;
+                App->audio->PlayMusic("Assets/Music/lose.ogg", 0, 0.0f);
             }
         }
-	}
-
-    //if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) // do we comment this line? (makes it really stable but there is no sensation of suspension)
-    {
-        btQuaternion newQuat = GetRotationQuaternion();										//Obtain rotation of car in quaternion form
-        vec3 newEulerAngles = App->camera->ToEulerAngles(newQuat);							//Transform quaternion to corresponding Euler angles
-        newEulerAngles.x *= RADTODEG;														//Convert to degrees because rotate function needs degrees :)
-        newEulerAngles.y *= RADTODEG;
-        newEulerAngles.z *= RADTODEG;
-        LOG("Angles: %f,%f,%f", newEulerAngles.x, newEulerAngles.y, newEulerAngles.z);
-        LOG("Pos: %f,%f,%f", GetX(), GetY(), GetZ());
 
 
-        if (App->input->GetKey(SDL_SCANCODE_F3) == KEY_DOWN)
+        //if (App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN) // do we comment this line? (makes it really stable but there is no sensation of suspension)
         {
-            mat4x4 matrix;
-            vehicle->GetTransform(&matrix);
-            matrix.rotate(180, vec3(1.0f, 0.0f, 1.0f));
-            vehicle->SetTransform(&matrix);
+            btQuaternion newQuat = GetRotationQuaternion();										//Obtain rotation of car in quaternion form
+            vec3 newEulerAngles = App->camera->ToEulerAngles(newQuat);							//Transform quaternion to corresponding Euler angles
+            newEulerAngles.x *= RADTODEG;														//Convert to degrees because rotate function needs degrees :)
+            newEulerAngles.y *= RADTODEG;
+            newEulerAngles.z *= RADTODEG;
+            LOG("Angles: %f,%f,%f", newEulerAngles.x, newEulerAngles.y, newEulerAngles.z);
+            LOG("Pos: %f,%f,%f", GetX(), GetY(), GetZ());
+
+
+            if (App->input->GetKey(SDL_SCANCODE_F4) == KEY_DOWN)
+            {
+                mat4x4 matrix;
+                vehicle->GetTransform(&matrix);
+                matrix.rotate(180, vec3(1.0f, 0.0f, 1.0f));
+                vehicle->SetTransform(&matrix);
+            }
+
+            if (abs(newEulerAngles.z) >= 75 && GetY() <= 3)
+            {
+                // Snap
+                //mat4x4 matrix;
+                //vehicle->GetTransform(&matrix);
+                //matrix.rotate(180, vec3(1.0f, 0.0f, 0.0f));
+                //matrix.rotate(newEulerAngles.y, vec3(0.0f, 1.0f, 0.0f));
+                //vehicle->SetTransform(&matrix);
+
+                // NOT snap
+                btScalar x = 0;
+                btScalar y = 0;
+                btScalar z = 75;
+                btVector3 torque(x, y, z);
+                vehicle->vehicle->getRigidBody()->applyTorqueImpulse(torque);
+                LOG("YAY Z!");
+            }
+            else if (abs(newEulerAngles.x) >= 75 && GetY() <= 3)
+            {
+                // Snap
+                //mat4x4 matrix;
+                //vehicle->GetTransform(&matrix);
+                //matrix.rotate(180, vec3(1.0f, 0.0f, 0.0f));
+                //matrix.rotate(newEulerAngles.y, vec3(0.0f, 1.0f, 0.0f));
+                //vehicle->SetTransform(&matrix);
+
+                // NOT snap
+                btScalar x = 75;
+                btScalar y = 0;
+                btScalar z = 0;
+                btVector3 torque(x, y, z);
+                vehicle->vehicle->getRigidBody()->applyTorqueImpulse(torque);
+                LOG("YAY X!");
+            }
         }
 
-        if (abs(newEulerAngles.z) >= 75 && GetY() <= 3)
-        {
-            // Snap
-            //mat4x4 matrix;
-            //vehicle->GetTransform(&matrix);
-            //matrix.rotate(180, vec3(1.0f, 0.0f, 0.0f));
-            //matrix.rotate(newEulerAngles.y, vec3(0.0f, 1.0f, 0.0f));
-            //vehicle->SetTransform(&matrix);
 
-            // NOT snap
-            btScalar x = 0;
-            btScalar y = 0;
-            btScalar z = 75;
-            btVector3 torque(x, y, z);
-            vehicle->vehicle->getRigidBody()->applyTorqueImpulse(torque);
-            LOG("YAY Z!");
-        }
-        else if (abs(newEulerAngles.x) >= 75 && GetY() <= 3)
-        {
-            // Snap
-            //mat4x4 matrix;
-            //vehicle->GetTransform(&matrix);
-            //matrix.rotate(180, vec3(1.0f, 0.0f, 0.0f));
-            //matrix.rotate(newEulerAngles.y, vec3(0.0f, 1.0f, 0.0f));
-            //vehicle->SetTransform(&matrix);
 
-            // NOT snap
-            btScalar x = 75;
-            btScalar y = 0;
-            btScalar z = 0;
-            btVector3 torque(x, y, z);
-            vehicle->vehicle->getRigidBody()->applyTorqueImpulse(torque);
-            LOG("YAY X!");
+        LOG("Velocity: %f", vehicle->GetKmh());
+        vehicle->ApplyEngineForce(acceleration);
+        vehicle->Turn(turn);
+        if (!debugReset)
+        {
+            vehicle->Brake(brake);
         }
+
+        vehicle->Render();
     }
-
-
-
-    LOG("Velocity: %f", vehicle->GetKmh());
-	vehicle->ApplyEngineForce(acceleration);
-	vehicle->Turn(turn);
-	vehicle->Brake(brake);
-
-	vehicle->Render();
-
-	char title[80];
-	sprintf_s(title, "%.1f Km/h", vehicle->GetKmh());
-	App->window->SetTitle(title);
 
 	return UPDATE_CONTINUE;
 }
@@ -238,3 +270,11 @@ btQuaternion ModulePlayer::GetRotationQuaternion()
 {
 	return vehicle->vehicle->getRigidBody()->getWorldTransform().getRotation();
 };
+void ModulePlayer::ResetPosition()
+{
+    mat4x4 matrix;
+    vehicle->SetPos(115, 0, 45);
+    vehicle->GetTransform(&matrix);
+    matrix.rotate(360, vec3(0.0f, 1.0f, 0.0f));
+    vehicle->SetTransform(&matrix);
+}

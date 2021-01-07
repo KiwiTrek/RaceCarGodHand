@@ -78,21 +78,23 @@ update_status ModuleCamera3D::Update(float dt)
 	{
 		case CameraType::NORMAL:
 		{
-			float zoomSpeed = 15.0f * dt;
-			if (App->input->GetMouseZ() > 0) playerDistance -= zoomSpeed;
-			if (App->input->GetMouseZ() < 0) playerDistance += zoomSpeed;
-			if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
+			if (!App->player->victory && !App->player->lose)
 			{
-				playerVerticalAngle = playerVerticalAngle - (App->input->GetMouseYMotion() * 0.25f);
-				//playerHorizontalAngle = playerHorizontalAngle - (App->input->GetMouseYMotion() * 0.25f);
+				float zoomSpeed = 15.0f * dt;
+				if (App->input->GetMouseZ() > 0) playerDistance -= zoomSpeed;
+				if (App->input->GetMouseZ() < 0) playerDistance += zoomSpeed;
+				if (App->input->GetMouseButton(SDL_BUTTON_RIGHT) == KEY_REPEAT)
+				{
+					playerVerticalAngle = playerVerticalAngle - (App->input->GetMouseYMotion() * 0.25f);
+					//playerHorizontalAngle = playerHorizontalAngle - (App->input->GetMouseYMotion() * 0.25f);
+				}
+				if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
+				{
+					lookBack = true;
+				}
+
+				FollowPlayer(lookBack);
 			}
-            if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
-            {
-                lookBack = true;
-            }
-
-			FollowPlayer(lookBack);
-
 			break;
 		}
 		case CameraType::DEBUG:
@@ -220,7 +222,7 @@ void ModuleCamera3D::CalculateViewMatrix()
 void ModuleCamera3D::FollowPlayer(bool lookBack)
 {
 	// Move position of camera reference frame to player's CM
-	Reference = { App->player->GetX(), App->player->GetY(), App->player->GetZ() };
+	Reference = { (float)App->player->GetX(), (float)App->player->GetY(), (float)App->player->GetZ() };
 
 	// Rotate unitary axis XYZ of the camera's reference frame to align with local car orientation
 	btQuaternion newQuat = App->player->GetRotationQuaternion();											//Obtain rotation of car in quaternion form
