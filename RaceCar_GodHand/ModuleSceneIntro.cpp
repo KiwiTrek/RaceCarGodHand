@@ -30,9 +30,36 @@ bool ModuleSceneIntro::Start()
     start = true;
     onceMusic = true;
     onceMusicIntro = true;
+    check_line = false;
+    check_1 = true;
 
     lapCounter = 0;
-    maxLaps = 0;
+    maxLaps = 3;
+
+    //------------SENSORS----------------------------
+    //----------Finish Line--------------------------
+    c_finish.Size(30, 10, 1);
+    finish_line = App->physics->AddBody(c_finish, 0);
+    finish_line->SetPos(115, 0, 50);
+    finish_line->GetTransform(&c_finish.transform);
+    finish_line->SetAsSensor(true);
+    finish_line->collision_listeners.add(this);
+
+    //------Check point 1----------------------------
+    c_ck1.Size(1, 10, 30);
+    check_point1 = App->physics->AddBody(c_ck1, 0);
+    check_point1->SetPos(-100, 0, -125);
+    check_point1->GetTransform(&c_ck1.transform);
+    check_point1->SetAsSensor(true);
+    check_point1->collision_listeners.add(this);
+
+    //------ Dead Zone ------------------------------
+    c_dead.Size(40, 1, 20);
+    dead_zone = App->physics->AddBody(c_dead, 0);
+    dead_zone->SetPos(10, 0, 15);
+    dead_zone->GetTransform(&c_dead.transform);
+    dead_zone->SetAsSensor(true);
+    dead_zone->collision_listeners.add(this);
 
 	return ret;
 }
@@ -120,6 +147,27 @@ update_status ModuleSceneIntro::Update(float dt)
 
 void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
 {
+    if (body1 == finish_line)
+    {
+        if (lapCounter == maxLaps)
+        {
+            App->player->victory = true;
+        }
+        else if (check_1 == true)
+        {
+            check_1 = false;
+            lapCounter++;
+            check_line = true;
+        }
+    }
+    else if (body1 == check_point1)
+    {
+        if (check_line == true)
+        {
+            check_line = false;
+            check_1 = true;
+        }
+    }
 }
 
 void ModuleSceneIntro::Reset()

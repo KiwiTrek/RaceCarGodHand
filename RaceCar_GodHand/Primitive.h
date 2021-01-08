@@ -43,6 +43,7 @@ public :
 	Cube();
 	Cube(float sizeX, float sizeY, float sizeZ);
 	void InnerRender() const;
+	void Size(float x, float y, float z);
 public:
 	vec3 size;
 };

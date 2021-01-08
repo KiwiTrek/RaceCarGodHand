@@ -52,6 +52,9 @@ public:
 	bool start;
 	bool onceMusic;
 	bool onceMusicIntro;
+	bool check_line;
+	bool check_1;
+
 	int lapCounter;
 	int maxLaps;
 	float timer;
@@ -69,4 +72,15 @@ public:
 
 	PhysMotor3D* left_wheel;
 	PhysMotor3D* right_wheel;
+
+	//Sensors
+	PhysBody3D* finish_line;
+	Cube c_finish;
+
+	PhysBody3D* check_point1;
+	Cube c_ck1;
+
+	PhysBody3D* dead_zone;
+	Cube c_dead;
+
 };

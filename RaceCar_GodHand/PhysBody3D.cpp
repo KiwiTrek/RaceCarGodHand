@@ -45,3 +45,15 @@ void PhysBody3D::SetPos(float x, float y, float z)
 	t.setOrigin(btVector3(x, y, z));
 	body->setWorldTransform(t);
 }
+
+void PhysBody3D::SetAsSensor(bool isSensor)
+{
+	if (this->isSensor != isSensor)
+	{
+		this->isSensor = isSensor;
+		if (isSensor == true)
+			body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+		else
+			body->setCollisionFlags(body->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	}
+}

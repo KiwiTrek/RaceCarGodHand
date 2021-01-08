@@ -100,6 +100,8 @@ bool ModulePlayer::Start()
     car.wheels[3].steering = false;
 
     vehicle = App->physics->AddVehicle(car);
+    vehicle->collision_listeners.add(this);
+
     ResetPosition();
 
     victory = false;
