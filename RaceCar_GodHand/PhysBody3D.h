@@ -20,6 +20,7 @@ public:
 	void SetPos(float x, float y, float z);
 	void SetAsSensor(bool isSensor);
 
+	bool isChecked;
 private:
 	btRigidBody* body = nullptr;
 	bool isSensor;

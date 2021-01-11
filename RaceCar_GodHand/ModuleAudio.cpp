@@ -147,7 +147,7 @@ bool ModuleAudio::UnloadFx(uint index)
 	return false;
 }
 
-bool ModuleAudio::PlayFx(uint id, int repeat)
+int ModuleAudio::PlayFx(uint id, int repeat)
 {
 	Mix_Chunk* chunk = NULL;
 
@@ -155,12 +155,14 @@ bool ModuleAudio::PlayFx(uint id, int repeat)
 	{
 		if (id > 0 && id <= fx.count())
 		{
-			Mix_PlayChannel(-1, chunk, repeat);
+			return Mix_PlayChannel(-1, chunk, repeat);
 		}
 	}
+}
 
-
-	return true;
+int ModuleAudio::StopFx(int channel)
+{
+	return Mix_HaltChannel(channel);
 }
 
 bool ModuleAudio::SetFxVolume(uint index)

@@ -14,12 +14,12 @@ ModuleCamera3D::ModuleCamera3D(Application* app, bool start_enabled) : Module(ap
 	Y = vec3(0.0f, 1.0f, 0.0f);
 	Z = vec3(0.0f, 0.0f, 1.0f);
 
-	cameraType = CameraType::DEBUG;
+	cameraType = CameraType::EAGLE;
 
 	Position = vec3(0.0f, 5.0f, 5.0f);
 	Reference = vec3(0.0f, 0.0f, 0.0f);
 	playerDistance = 15.0f;
-	playerVerticalAngle = 30.0f;
+	playerVerticalAngle = 20.0f;
 	//playerHorizontalAngle = 0.0;
     lookBack = false;
 }
@@ -52,19 +52,21 @@ update_status ModuleCamera3D::Update(float dt)
 		switch (cameraType)
 		{
 		case CameraType::NORMAL:
-			cameraType = CameraType::EAGLE;
-			Position = { 0,150,200 };
-			LookAt({ 0,0,0 });
+			cameraType = CameraType::DEBUG;
 			break;
 		case CameraType::EAGLE:
 			cameraType = CameraType::DEBUG;
-			Position = { 0,0,0 };
-			Move({ 0,1.0f,1.0f });
-			LookAt({ 0,0,0 });
 			break;
 		case CameraType::DEBUG:
-			cameraType = CameraType::NORMAL;
-			Position = { App->player->GetX(), App->player->GetY() + 10.0f, App->player->GetZ() + 15.0f };
+			if (App->scene_intro->start)
+			{
+				cameraType = CameraType::EAGLE;
+			}
+			else
+			{
+				cameraType = CameraType::NORMAL;
+				Position = { App->player->GetX(), App->player->GetY() + 10.0f, App->player->GetZ() + 15.0f };
+			}
 			break;
 		}
 	}
@@ -99,9 +101,9 @@ update_status ModuleCamera3D::Update(float dt)
 		}
 		case CameraType::DEBUG:
 		{
-			float speed = 3.0f * dt;
+			float speed = 10.0f * dt;
 			if (App->input->GetKey(SDL_SCANCODE_RSHIFT) == KEY_REPEAT)
-				speed = 8.0f * dt;
+				speed = 50.0f * dt;
 
 			if (App->input->GetKey(SDL_SCANCODE_COMMA) == KEY_REPEAT) newPos.y += speed;
 			if (App->input->GetKey(SDL_SCANCODE_PERIOD) == KEY_REPEAT) newPos.y -= speed;
@@ -153,6 +155,7 @@ update_status ModuleCamera3D::Update(float dt)
 		{
 			Position = { 0,150,200 };
 			LookAt({ 0,0,0 });
+			break;
 		}
 	}
 

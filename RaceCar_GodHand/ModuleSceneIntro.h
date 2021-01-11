@@ -3,6 +3,7 @@
 #include "p2DynArray.h"
 #include "p2Point.h"
 #include "Globals.h"
+#include "Text.h"
 #include "Primitive.h"
 
 #define MAX_ELEMENTS 1024
@@ -52,12 +53,16 @@ public:
 	bool start;
 	bool onceMusic;
 	bool onceMusicIntro;
-	bool check_line;
-	bool check_1;
+	bool onceFinished;
 
+	Text textManager;
+
+	int lapFx;
 	int lapCounter;
 	int maxLaps;
 	float timer;
+
+	vec3 finalCarPos;
 
     p2DynArray<Primitive*> c_circuit;
 

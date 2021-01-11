@@ -102,10 +102,26 @@ bool ModulePlayer::Start()
     vehicle = App->physics->AddVehicle(car);
     vehicle->collision_listeners.add(this);
 
-    ResetPosition();
-
     victory = false;
     lose = false;
+
+    acceleratingChannel = -1;
+    accelerationFx = App->audio->LoadFx("Assets/Fx/accel.wav");
+
+    backwardsChannel = -1;
+    backwardsFx = App->audio->LoadFx("Assets/Fx/backwards.wav");
+
+    brakeFx = App->audio->LoadFx("Assets/Fx/brake.wav");
+    turnFx = App->audio->LoadFx("Assets/Fx/steer.wav");
+
+    ResetPosition();
+
+    isAccelerating = false;
+    isGoingBackwards = false;
+    isBraking = false;
+    isStarting = false;
+    isTurningLeft = false;
+    isTurningRight = false;
 
     return true;
 }
@@ -114,6 +130,10 @@ bool ModulePlayer::Start()
 bool ModulePlayer::CleanUp()
 {
 	LOG("Unloading player");
+    App->audio->UnloadFx(accelerationFx);
+    App->audio->UnloadFx(brakeFx);
+    App->audio->UnloadFx(turnFx);
+    App->audio->UnloadFx(backwardsFx);
 
 	return true;
 }
@@ -130,26 +150,74 @@ update_status ModulePlayer::Update(float dt)
         {
             if (App->input->GetKey(SDL_SCANCODE_W) == KEY_REPEAT)
             {
-                if (vehicle->GetKmh() < 0.0)
+                if (!isAccelerating)
+                {
+                    acceleratingChannel = App->audio->PlayFx(accelerationFx, -1);
+                    isAccelerating = true;
+                }
+                if (vehicle->GetKmh() < -1.0)
                 {
                     brake = BRAKE_POWER;
+                    if (!isStarting)
+                    {
+                        isStarting = true;
+                        App->audio->PlayFx(brakeFx);
+                    }
                 }
-                if (vehicle->GetKmh() <= 75.0f && App->input->GetKey(SDL_SCANCODE_LCTRL) != KEY_REPEAT);
+                if (vehicle->GetKmh() <= 55.0f && App->input->GetKey(SDL_SCANCODE_LCTRL) != KEY_REPEAT);
                 {
                     acceleration = MAX_ACCELERATION;
                 }
             }
+            else
+            {
+                if (isAccelerating)
+                {
+                    App->audio->StopFx(acceleratingChannel);
+                    isAccelerating = false;
+                }
+                if (isStarting)
+                {
+                    isStarting = false;
+                }
+            }
 
-            if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT)
+            if (App->input->GetKey(SDL_SCANCODE_A) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_D) != KEY_REPEAT)
             {
                 if (turn < TURN_DEGREES)
                     turn += TURN_DEGREES;
+
+                if (!isTurningLeft && !isGoingBackwards)
+                {
+                    isTurningLeft = true;
+                    App->audio->PlayFx(turnFx, 0);
+                }
+            }
+            else
+            {
+                if (isTurningLeft == true)
+                {
+                    isTurningLeft = false;
+                }
             }
 
-            if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT)
+            if (App->input->GetKey(SDL_SCANCODE_D) == KEY_REPEAT && App->input->GetKey(SDL_SCANCODE_A) != KEY_REPEAT)
             {
                 if (turn > -TURN_DEGREES)
                     turn -= TURN_DEGREES;
+
+                if (!isTurningRight && !isGoingBackwards)
+                {
+                    isTurningRight = true;
+                    App->audio->PlayFx(turnFx, 0);
+                }
+            }
+            else
+            {
+                if (isTurningRight == true)
+                {
+                    isTurningRight = false;
+                }
             }
 
             if (App->input->GetKey(SDL_SCANCODE_S) == KEY_REPEAT)
@@ -161,7 +229,29 @@ update_status ModulePlayer::Update(float dt)
                     if (vehicle->GetKmh() >= -25.0f)
                     {
                         acceleration = MAX_BACKWARDS_ACCELERATION;
+                        if (!isGoingBackwards)
+                        {
+                            isGoingBackwards = true;
+                            backwardsChannel = App->audio->PlayFx(backwardsFx, -1);
+                        }
                     }
+                }
+                if (!isBraking)
+                {
+                    isBraking = true;
+                    App->audio->PlayFx(brakeFx);
+                }
+            }
+            else
+            {
+                if (isGoingBackwards)
+                {
+                    isGoingBackwards = false;
+                    App->audio->StopFx(backwardsChannel);
+                }
+                if (isBraking)
+                {
+                    isBraking = false;
                 }
             }
 
@@ -249,8 +339,11 @@ update_status ModulePlayer::Update(float dt)
         {
             vehicle->Brake(brake);
         }
-
-        vehicle->Render();
+        
+        if (!App->physics->debug)
+        {
+            vehicle->Render();
+        }
     }
 
 	return UPDATE_CONTINUE;
@@ -279,4 +372,13 @@ void ModulePlayer::ResetPosition()
     vehicle->GetTransform(&matrix);
     matrix.rotate(360, vec3(0.0f, 1.0f, 0.0f));
     vehicle->SetTransform(&matrix);
+    if (acceleratingChannel != -1)
+    {
+        App->audio->StopFx(acceleratingChannel);
+    }
+    
+    if (backwardsChannel != -1)
+    {
+        App->audio->StopFx(backwardsChannel);
+    }
 }

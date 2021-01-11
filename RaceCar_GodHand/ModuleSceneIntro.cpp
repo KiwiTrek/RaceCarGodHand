@@ -23,17 +23,16 @@ bool ModuleSceneIntro::Start()
 
     BuildCircuit();
 
-	App->camera->Position = { 0,150,200 };
-	App->camera->LookAt(vec3(0, 0, 0));
+    App->camera->Position = { 0,150,200 };
+    App->camera->LookAt({ 0,0,0 });
 
     timer = 0.0f;
     start = true;
     onceMusic = true;
     onceMusicIntro = true;
-    check_line = false;
-    check_1 = true;
+    onceFinished = true;
 
-    lapCounter = 0;
+    lapCounter = -1;
     maxLaps = 3;
 
     //------------SENSORS----------------------------
@@ -43,6 +42,7 @@ bool ModuleSceneIntro::Start()
     finish_line->SetPos(115, 0, 50);
     finish_line->GetTransform(&c_finish.transform);
     finish_line->SetAsSensor(true);
+    finish_line->isChecked = false;
     finish_line->collision_listeners.add(this);
 
     //------Check point 1----------------------------
@@ -51,6 +51,7 @@ bool ModuleSceneIntro::Start()
     check_point1->SetPos(-100, 0, -125);
     check_point1->GetTransform(&c_ck1.transform);
     check_point1->SetAsSensor(true);
+    check_point1->isChecked = true;
     check_point1->collision_listeners.add(this);
 
     //------ Dead Zone ------------------------------
@@ -61,6 +62,8 @@ bool ModuleSceneIntro::Start()
     dead_zone->SetAsSensor(true);
     dead_zone->collision_listeners.add(this);
 
+    lapFx = App->audio->LoadFx("Assets/Fx/lap.wav");
+
 	return ret;
 }
 
@@ -68,6 +71,8 @@ bool ModuleSceneIntro::Start()
 bool ModuleSceneIntro::CleanUp()
 {
 	LOG("Unloading Intro scene");
+
+    App->audio->UnloadFx(lapFx);
 
 	return true;
 }
@@ -82,9 +87,6 @@ update_status ModuleSceneIntro::Update(float dt)
 
     if (start)
     {
-        App->camera->Position = { 0,150,200 };
-        App->camera->LookAt(vec3(0, 0, 0));
-
         if (onceMusicIntro)
         {
             App->audio->PlayMusic("Assets/Music/title.ogg",-1,0.0f);
@@ -105,19 +107,23 @@ update_status ModuleSceneIntro::Update(float dt)
     if (start)
     {
         App->window->SetTitle("God Hand's RACECAR! Press Enter to play.");
+        textManager.PrintTextOnMap(-50.0f, 100.0f, 0.0f, Red, Font::TIMES_ROMAN_24, "God Hand's RACECAR! Press Enter to play.");
     }
     else if (!App->player->victory && !App->player->lose)
     {
-        App->camera->cameraType = CameraType::NORMAL;
         if (onceMusic)
         {
+            App->camera->cameraType = CameraType::NORMAL;
+            App->player->ResetPosition();
             App->audio->PlayMusic("Assets/Music/game.ogg");
             onceMusic = false;
         }
         timer += dt;
         char title[80];
-        sprintf_s(title, "Laps: %d / %d, Timer:%.1f, Velocity: %.1f Km/h", lapCounter, maxLaps, timer, App->player->vehicle->GetKmh());
+        sprintf_s(title, "Laps: %d / %d, Timer: %.1f", lapCounter, maxLaps, timer);
         App->window->SetTitle(title);
+
+        textManager.PrintTextOnMap(App->player->GetX(), App->player->GetY() + 7.0f, App->player->GetZ(), White, Font::TIMES_ROMAN_24, title);
     }
 
     if (!start && (App->player->victory || App->player->lose))
@@ -129,11 +135,27 @@ update_status ModuleSceneIntro::Update(float dt)
         char title[80];
         if (App->player->victory)
         {
-            sprintf_s(title, "You win! Your time has been %.1f. Press R to restart!", timer, App->player->vehicle->GetKmh());
+            if (onceFinished)
+            {
+                onceFinished = false;
+                finalCarPos.x = App->player->GetX();
+                finalCarPos.y = App->player->GetY() + 7.0f;
+                finalCarPos.z = App->player->GetZ();
+            }
+            sprintf_s(title, "You win! Your time has been %.1f. Press R to restart!", timer);
+            textManager.PrintTextOnMap(finalCarPos.x, finalCarPos.y, finalCarPos.z, White, Font::TIMES_ROMAN_24, title);
         }
         else if (App->player->lose)
         {
-            sprintf_s(title, "You lose... Your time has been %.1f. Press R to restart!", timer, App->player->vehicle->GetKmh());
+            if (onceFinished)
+            {
+                onceFinished = false;
+                finalCarPos.x = App->player->GetX();
+                finalCarPos.y = App->player->GetY() + 7.0f;
+                finalCarPos.z = App->player->GetZ();
+            }
+            sprintf_s(title, "You lose... Your time has been %.1f. Press R to restart!", timer);
+            textManager.PrintTextOnMap(finalCarPos.x, finalCarPos.y, finalCarPos.z, White, Font::TIMES_ROMAN_24, title);
         }
         App->window->SetTitle(title);
         if (App->input->GetKey(SDL_SCANCODE_R) == KEY_DOWN)
@@ -147,25 +169,31 @@ update_status ModuleSceneIntro::Update(float dt)
 
 void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
 {
-    if (body1 == finish_line)
+    if (!start)
     {
-        if (lapCounter == maxLaps)
+        if (body1 == finish_line)
         {
-            App->player->victory = true;
+            if (lapCounter == maxLaps)
+            {
+                App->player->victory = true;
+            }
+            //else if (check_1 == true)
+            else if (check_point1->isChecked == true)
+            {
+                check_point1->isChecked = false;
+                lapCounter++;
+                finish_line->isChecked = true;
+                App->audio->PlayFx(lapFx);
+            }
         }
-        else if (check_1 == true)
+        else if (body1 == check_point1)
         {
-            check_1 = false;
-            lapCounter++;
-            check_line = true;
-        }
-    }
-    else if (body1 == check_point1)
-    {
-        if (check_line == true)
-        {
-            check_line = false;
-            check_1 = true;
+            //if (check_line == true)
+            if (finish_line->isChecked == true)
+            {
+                finish_line->isChecked = false;
+                check_point1->isChecked = true;
+            }
         }
     }
 }
@@ -176,11 +204,15 @@ void ModuleSceneIntro::Reset()
     onceMusicIntro = true;
     timer = 0.0f;
     onceMusic = true;
-    lapCounter = 0;
-    maxLaps = 0;
+    lapCounter = -1;
+    maxLaps = 3;
+    onceFinished = true;
+    App->camera->cameraType = CameraType::EAGLE;
     App->player->victory = false;
     App->player->lose = false;
     App->player->ResetPosition();
+    finish_line->isChecked = false;
+    check_point1->isChecked = true;
 }
 
 void ModuleSceneIntro::BuildCircuit()

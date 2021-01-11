@@ -33,7 +33,9 @@ public:
 	int GetFxVolume();
 
 	// Play a previously loaded WAV
-	bool PlayFx(uint fx, int repeat = 0);
+	int PlayFx(uint fx, int repeat = 0);
+	int StopFx(int channel);
+
 private:
 
 	Mix_Music*			music;

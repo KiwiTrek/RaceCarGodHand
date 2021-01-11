@@ -117,13 +117,33 @@ update_status ModulePhysics3D::Update(float dt)
 
 	if(debug == true)
 	{
-		world->debugDrawWorld();
+		/*world->debugDrawWorld();*/
+
+		// Render sensors
+		btVector3 red = { 255,0,0 };
+		btVector3 green = { 0,255,0 };
+		p2List_item<PhysBody3D*>* itemSensor = bodies.getFirst();
+		while (itemSensor)
+		{
+			if (itemSensor->data->isSensor == true)
+			{
+				if (itemSensor->data->isChecked == false)
+				{
+					world->debugDrawObject(itemSensor->data->body->getWorldTransform(), itemSensor->data->body->getCollisionShape(), green);
+				}
+				else
+				{
+					world->debugDrawObject(itemSensor->data->body->getWorldTransform(), itemSensor->data->body->getCollisionShape(), red);
+				}
+			}
+			itemSensor = itemSensor->next;
+		}
 
 		// Render vehicles
 		p2List_item<PhysVehicle3D*>* item = vehicles.getFirst();
 		while(item)
 		{
-			item->data->Render();
+			item->data->DebugRender();
 			item = item->next;
 		}
 

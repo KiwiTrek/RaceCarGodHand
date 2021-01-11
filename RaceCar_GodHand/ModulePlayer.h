@@ -35,6 +35,20 @@ public:
 	float brake;
 	float timer;
 
+	int acceleratingChannel;
+	int accelerationFx;
+	int backwardsChannel;
+	int backwardsFx;
+	int brakeFx;
+	int turnFx;
+
 	bool victory;
 	bool lose;
+
+	bool isAccelerating;
+	bool isBraking;
+	bool isStarting;
+	bool isTurningLeft;
+	bool isTurningRight;
+	bool isGoingBackwards;
 };
