@@ -55,12 +55,34 @@ bool ModuleSceneIntro::Start()
     check_point1->collision_listeners.add(this);
 
     //------ Dead Zone ------------------------------
-    c_dead.Size(40, 1, 20);
+    c_dead.Size(40, 1, 25);
     dead_zone = App->physics->AddBody(c_dead, 0);
     dead_zone->SetPos(10, 0, 15);
     dead_zone->GetTransform(&c_dead.transform);
     dead_zone->SetAsSensor(true);
     dead_zone->collision_listeners.add(this);
+
+    //Out of bounds Dead Zone
+    c_ob_dead.Size(150, 1, 100);
+    ob_dead_zone = App->physics->AddBody(c_ob_dead, 0);
+    ob_dead_zone->SetPos(98, 0, -50);
+    ob_dead_zone->GetTransform(&c_ob_dead.transform);
+    ob_dead_zone->SetAsSensor(true);
+    ob_dead_zone->collision_listeners.add(this);
+
+    c_ob_dead_2.Size(70, 1, 50);
+    ob_dead_zone_2 = App->physics->AddBody(c_ob_dead_2, 0);
+    ob_dead_zone_2->SetPos(63, 0, 48);
+    ob_dead_zone_2->GetTransform(&c_ob_dead_2.transform);
+    ob_dead_zone_2->SetAsSensor(true);
+    ob_dead_zone_2->collision_listeners.add(this);
+
+    c_ob_dead_3.Size(110, 1, 70);
+    ob_dead_zone_3 = App->physics->AddBody(c_ob_dead_3, 0);
+    ob_dead_zone_3->SetPos(-58, 0, -35);
+    ob_dead_zone_3->GetTransform(&c_ob_dead_3.transform);
+    ob_dead_zone_3->SetAsSensor(true);
+    ob_dead_zone_3->collision_listeners.add(this);
 
     lapFx = App->audio->LoadFx("Assets/Fx/lap.wav");
 
@@ -180,6 +202,7 @@ void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
             //else if (check_1 == true)
             else if (check_point1->isChecked == true)
             {
+                CheckPoint();
                 check_point1->isChecked = false;
                 lapCounter++;
                 finish_line->isChecked = true;
@@ -191,11 +214,36 @@ void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
             //if (check_line == true)
             if (finish_line->isChecked == true)
             {
+                CheckPoint();
                 finish_line->isChecked = false;
                 check_point1->isChecked = true;
             }
         }
+        else if (body1 == dead_zone || body1 == ob_dead_zone || body1 == ob_dead_zone_2 || body1 == ob_dead_zone_3)
+        {
+            //Go last checkpoint;
+            GoLastCheckPoint();
+        }
     }
+}
+
+void ModuleSceneIntro::CheckPoint()
+{
+    c_x = App->player->GetX();
+    c_y = App->player->GetY();
+    c_z = App->player->GetZ();
+    App->player->vehicle->GetTransform(&c_matrix);
+}
+
+void ModuleSceneIntro::GoLastCheckPoint()
+{
+    App->player->vehicle->SetPos(c_x, c_y, c_z);
+    if(finish_line->isChecked == true)
+        c_matrix.rotate(360, vec3(0.0f, 1.0f, 0.0f));
+    else if(check_point1->isChecked == true)
+        c_matrix.rotate(270,vec3(0.0f, 1.0f, 0.0f));
+    App->player->vehicle->SetTransform(&c_matrix);
+    App->player->vehicle->Brake(1000.0f);
 }
 
 void ModuleSceneIntro::Reset()

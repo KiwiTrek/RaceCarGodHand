@@ -49,6 +49,9 @@ public:
 
 	void OnCollision(PhysBody3D* body1, PhysBody3D* body2);
 
+	void CheckPoint();
+	void GoLastCheckPoint();
+
 public:
 	bool start;
 	bool onceMusic;
@@ -87,5 +90,19 @@ public:
 
 	PhysBody3D* dead_zone;
 	Cube c_dead;
+	//Out of bounds deadzones
+	PhysBody3D* ob_dead_zone;
+	Cube c_ob_dead;
 
+	PhysBody3D* ob_dead_zone_2;
+	Cube c_ob_dead_2;
+
+	PhysBody3D* ob_dead_zone_3;
+	Cube c_ob_dead_3;
+
+	//Reset Car
+	mat4x4 c_matrix;
+	float c_x;
+	float c_y;
+	float c_z;
 };
