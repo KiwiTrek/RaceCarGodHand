@@ -35,55 +35,6 @@ bool ModuleSceneIntro::Start()
     lapCounter = -1;
     maxLaps = 3;
 
-    //------------SENSORS----------------------------
-    //----------Finish Line--------------------------
-    c_finish.Size(30, 10, 1);
-    finish_line = App->physics->AddBody(c_finish, 0);
-    finish_line->SetPos(115, 0, 50);
-    finish_line->GetTransform(&c_finish.transform);
-    finish_line->SetAsSensor(true);
-    finish_line->isChecked = false;
-    finish_line->collision_listeners.add(this);
-
-    //------Check point 1----------------------------
-    c_ck1.Size(1, 10, 30);
-    check_point1 = App->physics->AddBody(c_ck1, 0);
-    check_point1->SetPos(-100, 0, -125);
-    check_point1->GetTransform(&c_ck1.transform);
-    check_point1->SetAsSensor(true);
-    check_point1->isChecked = true;
-    check_point1->collision_listeners.add(this);
-
-    //------ Dead Zone ------------------------------
-    c_dead.Size(40, 1, 25);
-    dead_zone = App->physics->AddBody(c_dead, 0);
-    dead_zone->SetPos(10, 0, 15);
-    dead_zone->GetTransform(&c_dead.transform);
-    dead_zone->SetAsSensor(true);
-    dead_zone->collision_listeners.add(this);
-
-    //Out of bounds Dead Zone
-    c_ob_dead.Size(150, 1, 100);
-    ob_dead_zone = App->physics->AddBody(c_ob_dead, 0);
-    ob_dead_zone->SetPos(98, 0, -50);
-    ob_dead_zone->GetTransform(&c_ob_dead.transform);
-    ob_dead_zone->SetAsSensor(true);
-    ob_dead_zone->collision_listeners.add(this);
-
-    c_ob_dead_2.Size(70, 1, 50);
-    ob_dead_zone_2 = App->physics->AddBody(c_ob_dead_2, 0);
-    ob_dead_zone_2->SetPos(63, 0, 48);
-    ob_dead_zone_2->GetTransform(&c_ob_dead_2.transform);
-    ob_dead_zone_2->SetAsSensor(true);
-    ob_dead_zone_2->collision_listeners.add(this);
-
-    c_ob_dead_3.Size(110, 1, 70);
-    ob_dead_zone_3 = App->physics->AddBody(c_ob_dead_3, 0);
-    ob_dead_zone_3->SetPos(-58, 0, -35);
-    ob_dead_zone_3->GetTransform(&c_ob_dead_3.transform);
-    ob_dead_zone_3->SetAsSensor(true);
-    ob_dead_zone_3->collision_listeners.add(this);
-
     lapFx = App->audio->LoadFx("Assets/Fx/lap.wav");
 
 	return ret;
@@ -159,6 +110,7 @@ update_status ModuleSceneIntro::Update(float dt)
         {
             if (onceFinished)
             {
+                App->audio->PlayMusic("Assets/Music/victory.ogg", 0, 0.0f);
                 onceFinished = false;
                 finalCarPos.x = App->player->GetX();
                 finalCarPos.y = App->player->GetY() + 7.0f;
@@ -171,6 +123,7 @@ update_status ModuleSceneIntro::Update(float dt)
         {
             if (onceFinished)
             {
+                App->audio->PlayMusic("Assets/Music/lose.ogg", 0, 0.0f);
                 onceFinished = false;
                 finalCarPos.x = App->player->GetX();
                 finalCarPos.y = App->player->GetY() + 7.0f;
@@ -191,7 +144,7 @@ update_status ModuleSceneIntro::Update(float dt)
 
 void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
 {
-    if (!start)
+    if (!start && body2 == App->player->vehicle)
     {
         if (body1 == finish_line)
         {
@@ -243,7 +196,7 @@ void ModuleSceneIntro::GoLastCheckPoint()
     else if(check_point1->isChecked == true)
         c_matrix.rotate(270,vec3(0.0f, 1.0f, 0.0f));
     App->player->vehicle->SetTransform(&c_matrix);
-    App->player->vehicle->Brake(1000.0f);
+    App->player->vehicle->vehicle->getRigidBody()->setLinearVelocity(btVector3(0.0f, 0.0f, 0.0f));
 }
 
 void ModuleSceneIntro::Reset()
@@ -297,7 +250,7 @@ void ModuleSceneIntro::BuildCircuit()
 
     roadPosition.x = (halfRoad * 1.25f) - 1.0f;
     roadPosition.y = 27.0f;
-    float positionY = -1.0f;
+    float positionY = -1.5f;
     CreateRamp(roadPosition, positionY, halfRoad * 1.85f, 20, RoadType::VERTICAL_UP);
 
     float xPos = 0.f;
@@ -317,7 +270,7 @@ void ModuleSceneIntro::BuildCircuit()
 
     circleCenter.x = roadPosition.x - halfRoad * 3;
     circleCenter.y = previousRoadPos + size * 4;
-    CreateCurve(circleCenter, 30.0f, 90.0f, size, height, 35, pilonDistance, CurveType::TOP_RIGHT);
+    CreateCurve(circleCenter, 30.0f, 90.0f, size, height * 3, 35, pilonDistance, CurveType::TOP_RIGHT);
     CreateCurve(circleCenter, 10.0f, 90.0f, size, height, 12, pilonDistance, CurveType::TOP_RIGHT);
 
     roadPosition.x = circleCenter.x + 10.0f;
@@ -379,12 +332,68 @@ void ModuleSceneIntro::BuildCircuit()
 
     circleCenter.x = previousRoadPos + (halfRoad * 2) - (size * 3);
     circleCenter.y = roadPosition.y + (halfRoad * 2);
-    CreateCurve(circleCenter, 30.0f, 90.0f, size, height, 35, pilonDistance, CurveType::TOP_RIGHT);
+    CreateCurve(circleCenter, 30.0f, 90.0f, size, height * 3, 35, pilonDistance, CurveType::TOP_RIGHT);
     CreateCurve(circleCenter, 10.0f, 90.0f, size, height, 12, pilonDistance, CurveType::TOP_RIGHT);
 
     roadPosition.x = 115.0f;
     roadPosition.y = 33.25f;
     previousRoadPos = CreateRoad(roadPosition, size, height, 9, pilonDistance, halfRoad, RoadType::VERTICAL_DOWN);
+
+    //------------SENSORS----------------------------
+    //----------Finish Line--------------------------
+    c_finish.Size(30, 10, 1);
+    finish_line = App->physics->AddBody(c_finish, 0);
+    finish_line->SetPos(115, 0, 50);
+    finish_line->GetTransform(&c_finish.transform);
+    finish_line->SetAsSensor(true);
+    finish_line->isChecked = false;
+    finish_line->isDeath = false;
+    finish_line->collision_listeners.add(this);
+
+    //------Check point 1----------------------------
+    c_ck1.Size(1, 10, 30);
+    check_point1 = App->physics->AddBody(c_ck1, 0);
+    check_point1->SetPos(-100, 0, -125);
+    check_point1->GetTransform(&c_ck1.transform);
+    check_point1->SetAsSensor(true);
+    check_point1->isChecked = true;
+    check_point1->isDeath = false;
+    check_point1->collision_listeners.add(this);
+
+    //------ Dead Zone ------------------------------
+    c_dead.Size(40, 1, 25);
+    dead_zone = App->physics->AddBody(c_dead, 0);
+    dead_zone->SetPos(10, 0, 15);
+    dead_zone->GetTransform(&c_dead.transform);
+    dead_zone->SetAsSensor(true);
+    dead_zone->isDeath = true;
+    dead_zone->collision_listeners.add(this);
+
+    //Out of bounds Dead Zone
+    c_ob_dead.Size(150, 1, 100);
+    ob_dead_zone = App->physics->AddBody(c_ob_dead, 0);
+    ob_dead_zone->SetPos(98, 0, -50);
+    ob_dead_zone->GetTransform(&c_ob_dead.transform);
+    ob_dead_zone->SetAsSensor(true);
+    ob_dead_zone->isDeath = true;
+    ob_dead_zone->collision_listeners.add(this);
+
+    c_ob_dead_2.Size(70, 1, 50);
+    ob_dead_zone_2 = App->physics->AddBody(c_ob_dead_2, 0);
+    ob_dead_zone_2->SetPos(63, 0, 48);
+    ob_dead_zone_2->GetTransform(&c_ob_dead_2.transform);
+    ob_dead_zone_2->SetAsSensor(true);
+    ob_dead_zone_2->isDeath = true;
+    ob_dead_zone_2->collision_listeners.add(this);
+
+    c_ob_dead_3.Size(110, 1, 70);
+    ob_dead_zone_3 = App->physics->AddBody(c_ob_dead_3, 0);
+    ob_dead_zone_3->SetPos(-58, 0, -35);
+    ob_dead_zone_3->GetTransform(&c_ob_dead_3.transform);
+    ob_dead_zone_3->SetAsSensor(true);
+    ob_dead_zone_3->isDeath = true;
+    ob_dead_zone_3->collision_listeners.add(this);
+
 
     CreateBorders();
 }

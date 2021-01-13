@@ -24,6 +24,46 @@ struct VehicleInfo
 {
 	~VehicleInfo();
 	
+	//Car parts
+	vec3 bump_front_left_size;
+	vec3 bump_front_left_offset;
+	vec3 bump_front_right_size;
+	vec3 bump_front_right_offset;
+	vec3 bump_front_size;
+	vec3 bump_front_offset;
+
+	vec3 bump_left_size;
+	vec3 bump_left_offset;
+	vec3 joint_left_one_size;
+	vec3 joint_left_one_offset;
+	vec3 joint_left_two_size;
+	vec3 joint_left_two_offset;
+
+	vec3 bump_right_size;
+	vec3 bump_right_offset;
+	vec3 joint_right_one_size;
+	vec3 joint_right_one_offset;
+	vec3 joint_right_two_size;
+	vec3 joint_right_two_offset;
+
+	vec3 front_size;
+	vec3 front_offset;
+	vec3 joint_front_one_size;
+	vec3 joint_front_one_offset;
+	vec3 joint_front_two_size;
+	vec3 joint_front_two_offset;
+
+	float cabin_radious;
+	vec3 cabin_offset;
+
+	vec3 motor_size;
+	vec3 motor_offset;
+
+	vec3 motor_tube_top_left_size;
+	vec3 motor_tube_top_left_offset;
+	vec3 motor_tube_top_right_size;
+	vec3 motor_tube_top_right_offset;
+
 	vec3 chassis_size;
 	vec3 chassis_offset;
 	float mass;

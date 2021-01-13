@@ -21,6 +21,7 @@ public:
 	void SetAsSensor(bool isSensor);
 
 	bool isChecked;
+	bool isDeath;
 private:
 	btRigidBody* body = nullptr;
 	bool isSensor;

@@ -90,7 +90,7 @@ update_status ModuleCamera3D::Update(float dt)
 					playerVerticalAngle = playerVerticalAngle - (App->input->GetMouseYMotion() * 0.25f);
 					//playerHorizontalAngle = playerHorizontalAngle - (App->input->GetMouseYMotion() * 0.25f);
 				}
-				if (App->input->GetKey(SDL_SCANCODE_Q) == KEY_REPEAT)
+				if (App->input->GetKey(SDL_SCANCODE_LSHIFT) == KEY_REPEAT)
 				{
 					lookBack = true;
 				}

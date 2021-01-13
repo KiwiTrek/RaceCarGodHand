@@ -115,26 +115,20 @@ update_status ModulePhysics3D::Update(float dt)
     if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
 		debug = !debug;
 
+	btVector3 red = { 255,0,0 };
+	btVector3 green = { 0,255,0 };
+	btVector3 yellow = { 255, 255, 0 };
 	if(debug == true)
 	{
 		/*world->debugDrawWorld();*/
 
 		// Render sensors
-		btVector3 red = { 255,0,0 };
-		btVector3 green = { 0,255,0 };
 		p2List_item<PhysBody3D*>* itemSensor = bodies.getFirst();
 		while (itemSensor)
 		{
-			if (itemSensor->data->isSensor == true)
+			if (itemSensor->data->isSensor == true && itemSensor->data->isDeath == true)
 			{
-				if (itemSensor->data->isChecked == false)
-				{
-					world->debugDrawObject(itemSensor->data->body->getWorldTransform(), itemSensor->data->body->getCollisionShape(), green);
-				}
-				else
-				{
-					world->debugDrawObject(itemSensor->data->body->getWorldTransform(), itemSensor->data->body->getCollisionShape(), red);
-				}
+				world->debugDrawObject(itemSensor->data->body->getWorldTransform(), itemSensor->data->body->getCollisionShape(), red);
 			}
 			itemSensor = itemSensor->next;
 		}
@@ -154,6 +148,23 @@ update_status ModulePhysics3D::Update(float dt)
 			float force = 30.0f;
 			AddBody(s)->Push(-(App->camera->Z.x * force), -(App->camera->Z.y * force), -(App->camera->Z.z * force));
 		}
+	}
+
+	p2List_item<PhysBody3D*>* itemSensor = bodies.getFirst();
+	while (itemSensor)
+	{
+		if (itemSensor->data->isSensor == true && itemSensor->data->isDeath == false)
+		{
+			if (itemSensor->data->isChecked == false)
+			{
+				world->debugDrawObject(itemSensor->data->body->getWorldTransform(), itemSensor->data->body->getCollisionShape(), green);
+			}
+			else
+			{
+				world->debugDrawObject(itemSensor->data->body->getWorldTransform(), itemSensor->data->body->getCollisionShape(), yellow);
+			}
+		}
+		itemSensor = itemSensor->next;
 	}
 
 	return UPDATE_CONTINUE;
