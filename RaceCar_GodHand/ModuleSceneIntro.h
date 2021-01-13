@@ -100,6 +100,9 @@ public:
 	PhysBody3D* ob_dead_zone_3;
 	Cube c_ob_dead_3;
 
+	//Obstacles
+	PhysBody3D* sphereBody;
+
 	//Reset Car
 	mat4x4 c_matrix;
 	float c_x;

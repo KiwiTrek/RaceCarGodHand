@@ -177,6 +177,11 @@ void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
             //Go last checkpoint;
             GoLastCheckPoint();
         }
+        else if (body1 == sphereBody)
+        {
+            float force = 30.0f;
+            body1->Push(-(App->camera->Z.x * force), -(App->camera->Z.y * force), -(App->camera->Z.z * force));
+        }
     }
 }
 
@@ -393,6 +398,96 @@ void ModuleSceneIntro::BuildCircuit()
     ob_dead_zone_3->SetAsSensor(true);
     ob_dead_zone_3->isDeath = true;
     ob_dead_zone_3->collision_listeners.add(this);
+
+    //------ Obstacle -------------------------------
+    //Sphere s(1);
+    //s.SetPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);
+    //float force = 30.0f;
+    //App->physics->AddBody(s)->Push(-(App->camera->Z.x * force), -(App->camera->Z.y * force), -(App->camera->Z.z * force));
+
+    //sph.radius = 100;
+    //sphereObstacle = App->physics->AddBody(sph, 0);
+    //sphereObstacle->SetPos(100, 100, 20);
+    //sphereObstacle->GetTransform(&sph.transform);
+    //sphereObstacle->collision_listeners.add(this);
+
+
+    Sphere* pastRope = new Sphere(0.1f);
+    c_circuit.PushBack(pastRope);
+    pastRope->SetPos(12, 13.0f, 10);
+    pastRope->color = { 1,0.5,0,1 };
+    PhysBody3D* pastRopeBody = App->physics->AddBody(*pastRope);
+    Sphere* rope;
+    float i = 13.0f;
+    while (i > 8.9f && i < 13.1f)
+    {
+        float j = i - 0.2f;
+        if (i != 13.0f)
+        {
+            pastRope = rope;
+            c_circuit.PushBack(pastRope);
+            pastRope->SetPos(12, i, 10);
+            pastRope->color = { 1,0.5,0,1 };
+            pastRopeBody = App->physics->AddBody(*pastRope);
+        }
+
+        rope = new Sphere(0.1f);
+        c_circuit.PushBack(rope);
+        rope->SetPos(12, j, 10);
+        rope->color = { 1,0.5,0,1 };
+        PhysBody3D* ropeBody = App->physics->AddBody(*rope);
+
+        App->physics->AddConstraintP2P(*pastRopeBody, *ropeBody, { 0,0,0 }, { 0,0,0 });
+
+        if (j > 8.9f && j < 9.1f)
+        {
+            pastRope = rope;
+            c_circuit.PushBack(rope);
+            rope->SetPos(12, j, 10);
+            rope->color = { 1,0.5,0,1 };
+        }
+        LOG("chain");
+        i = j;
+    }
+
+    Sphere* sphereObst = new Sphere(3);
+    c_circuit.PushBack(sphereObst);
+    sphereObst->SetPos(12, 6, 10);
+    sphereObst->color = { 1,0.5,0,1 };
+    sphereBody = App->physics->AddBody(*sphereObst, 50.f);
+
+    //Sphere* sphereObstAnchor = new Sphere(1);
+    //c_circuit.PushBack(sphereObstAnchor);
+    //sphereObstAnchor->SetPos(12, 10, 10);
+    //sphereObstAnchor->color = { 1,0.5,0,1 };
+    //PhysBody3D* sphereAnchorBody = App->physics->AddBody(*sphereObstAnchor);
+
+    //App->physics->AddConstraintP2P(*sphereBody, *sphereAnchorBody, { 0,0,0 }, { 0,0,0 });
+
+    //Sphere* sphereObstAnchor2 = new Sphere(1);
+    //c_circuit.PushBack(sphereObstAnchor2);
+    //sphereObstAnchor2->SetPos(12, 12, 10);
+    //sphereObstAnchor2->color = { 1,0.5,0,1 };
+    //PhysBody3D* sphereAnchorBody2 = App->physics->AddBody(*sphereObstAnchor2);
+
+    //App->physics->AddConstraintP2P(*sphereAnchorBody, *sphereAnchorBody2, { 0,0,0 }, { 0,0,0 });
+
+
+
+
+
+    //Cube* border1 = new Cube(400.0f, 500.0f, 1.0f);
+    //c_circuit.PushBack(border1);
+    //border1->SetPos(0.0f, 250.0f, 200.0f);
+    //border1->color = { 0.67f, 0.84f, 0.9f, 1.0f };
+
+    //Cylinder* c = new Cylinder(sizePilon, heightPilon);
+    //c->SetRotation(90.0f, { 0.0f,0.0f,1.0f });
+    //c_circuit.PushBack(c);
+    //c->SetPos(init.x + halfRoad, 0.f + heightPilon / 2, init.y + zPos);
+    //c->color = { 1,0.5,0,1 };
+    //App->physics->AddBody(*c, 0.0f);
+    //zPos += sizePilon + sizePilon + pilonDistance;
 
 
     CreateBorders();
