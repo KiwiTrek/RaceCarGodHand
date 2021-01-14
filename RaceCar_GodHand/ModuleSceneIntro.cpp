@@ -499,7 +499,8 @@ float ModuleSceneIntro::CreateRoad(p2Point<float> init, float sizePilon, float h
                 c_circuit.PushBack(c);
                 c->SetPos(init.x + halfRoad, 0.f + heightPilon / 2, init.y + zPos);
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 zPos += sizePilon + sizePilon + pilonDistance;
             }
 
@@ -511,7 +512,8 @@ float ModuleSceneIntro::CreateRoad(p2Point<float> init, float sizePilon, float h
                 c_circuit.PushBack(c);
                 c->SetPos(init.x - halfRoad, 0.f + heightPilon / 2, init.y + zPos);
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 zPos += sizePilon + sizePilon + pilonDistance;
             }
             return zPos;
@@ -526,7 +528,8 @@ float ModuleSceneIntro::CreateRoad(p2Point<float> init, float sizePilon, float h
                 c_circuit.PushBack(c);
                 c->SetPos(init.x + xPos, 0.f + heightPilon / 2, init.y + halfRoad);
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 xPos += sizePilon + sizePilon + pilonDistance;
             }
 
@@ -538,7 +541,8 @@ float ModuleSceneIntro::CreateRoad(p2Point<float> init, float sizePilon, float h
                 c_circuit.PushBack(c);
                 c->SetPos(init.x + xPos, 0.f + heightPilon / 2, init.y - halfRoad);
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 xPos += sizePilon + sizePilon + pilonDistance;
             }
             return xPos;
@@ -553,7 +557,8 @@ float ModuleSceneIntro::CreateRoad(p2Point<float> init, float sizePilon, float h
                 c_circuit.PushBack(c);
                 c->SetPos(init.x + halfRoad, 0.f + heightPilon / 2, init.y + zPos);
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 zPos -= sizePilon + sizePilon + pilonDistance;
             }
 
@@ -565,7 +570,8 @@ float ModuleSceneIntro::CreateRoad(p2Point<float> init, float sizePilon, float h
                 c_circuit.PushBack(c);
                 c->SetPos(init.x - halfRoad, 0.f + heightPilon / 2, init.y + zPos);
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 zPos -= sizePilon + sizePilon + pilonDistance;
             }
             return zPos;
@@ -580,7 +586,8 @@ float ModuleSceneIntro::CreateRoad(p2Point<float> init, float sizePilon, float h
                 c_circuit.PushBack(c);
                 c->SetPos(init.x + xPos, 0.f + heightPilon / 2, init.y + halfRoad);
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 xPos -= sizePilon + sizePilon + pilonDistance;
             }
 
@@ -592,7 +599,8 @@ float ModuleSceneIntro::CreateRoad(p2Point<float> init, float sizePilon, float h
                 c_circuit.PushBack(c);
                 c->SetPos(init.x + xPos, 0.f + heightPilon / 2, init.y - halfRoad);
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 xPos -= sizePilon + sizePilon + pilonDistance;
             }
             return xPos;
@@ -616,7 +624,8 @@ void ModuleSceneIntro::CreateCurve(p2Point<float> circleCenter, float radious, f
                 c_circuit.PushBack(c);
                 c->SetPos(circleCenter.x + 10.0f + (radious * -cos(DEGTORAD * ang)), 0.f + heightPilon / 2, circleCenter.y + (radious * sin(DEGTORAD * ang)));
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 ang += referenceAngle / numPilons;
             }
             break;
@@ -630,7 +639,8 @@ void ModuleSceneIntro::CreateCurve(p2Point<float> circleCenter, float radious, f
                 c_circuit.PushBack(c);
                 c->SetPos(circleCenter.x + 10.0f + (radious * cos(DEGTORAD * ang)), 0.f + heightPilon / 2, circleCenter.y + (radious * sin(DEGTORAD * ang)));
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 ang += referenceAngle / numPilons;
             }
             break;
@@ -644,7 +654,8 @@ void ModuleSceneIntro::CreateCurve(p2Point<float> circleCenter, float radious, f
                 c_circuit.PushBack(c);
                 c->SetPos(circleCenter.x + 10.0f + (radious * -cos(DEGTORAD * ang)), 0.f + heightPilon / 2, circleCenter.y + (radious * -sin(DEGTORAD * ang)));
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 ang += referenceAngle / numPilons;
             }
             break;
@@ -658,7 +669,8 @@ void ModuleSceneIntro::CreateCurve(p2Point<float> circleCenter, float radious, f
                 c_circuit.PushBack(c);
                 c->SetPos(circleCenter.x + 10.0f + (radious * cos(DEGTORAD * ang)), 0.f + heightPilon / 2, circleCenter.y + (radious * -sin(DEGTORAD * ang)));
                 c->color = { 1,0.5,0,1 };
-                App->physics->AddBody(*c, 0.0f);
+                c->body = App->physics->AddBody(*c, 0.0f);
+                c->body->SetAsSensor(false);
                 ang += referenceAngle / numPilons;
             }
             break;
@@ -677,7 +689,8 @@ void ModuleSceneIntro::CreateRamp(p2Point<float> position, float height, float l
             r->SetRotation(-angle, { 1,0,0 });
             c_circuit.PushBack(r);
             r->color = { 0,0,1,1 };
-            App->physics->AddBody(*r, 0.0f);
+            r->body = App->physics->AddBody(*r, 0.0f);
+            r->body->SetAsSensor(false);
             break;
         }
     case RoadType::HORIZONTAL_RIGHT:
@@ -687,7 +700,8 @@ void ModuleSceneIntro::CreateRamp(p2Point<float> position, float height, float l
             r->SetRotation(angle, { 0,0,1 });
             c_circuit.PushBack(r);
             r->color = { 0,0,1,1 };
-            App->physics->AddBody(*r, 0.0f);
+            r->body = App->physics->AddBody(*r, 0.0f);
+            r->body->SetAsSensor(false);
             break;
         }
     case RoadType::VERTICAL_UP:
@@ -697,7 +711,8 @@ void ModuleSceneIntro::CreateRamp(p2Point<float> position, float height, float l
             r->SetRotation(angle, { 1,0,0 });
             c_circuit.PushBack(r);
             r->color = { 0,0,1,1 };
-            App->physics->AddBody(*r, 0.0f);
+            r->body = App->physics->AddBody(*r, 0.0f);
+            r->body->SetAsSensor(false);
             break;
         }
     case RoadType::HORIZONTAL_LEFT:
@@ -707,7 +722,8 @@ void ModuleSceneIntro::CreateRamp(p2Point<float> position, float height, float l
             r->SetRotation(-angle, { 0,0,1 });
             c_circuit.PushBack(r);
             r->color = { 0,0,1,1 };
-            App->physics->AddBody(*r, 0.0f);
+            r->body = App->physics->AddBody(*r, 0.0f);
+            r->body->SetAsSensor(false);
             break;
         }
     }
