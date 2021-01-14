@@ -6,10 +6,19 @@
 PhysBody3D::PhysBody3D(btRigidBody* body) : body(body)
 {}
 
+PhysBody3D::PhysBody3D()
+{}
+
 // ---------------------------------------------------------
 PhysBody3D::~PhysBody3D()
 {
 	delete body;
+}
+
+// ---------------------------------------------------------
+btRigidBody* PhysBody3D::GetBody()
+{
+	return body;
 }
 
 // ---------------------------------------------------------

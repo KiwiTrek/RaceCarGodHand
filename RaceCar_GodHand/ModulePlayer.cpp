@@ -342,33 +342,8 @@ update_status ModulePlayer::Update(float dt)
                 vehicle->SetTransform(&matrix);
             }
 
-            //if (abs(newEulerAngles.z) >= 75 && GetY() <= 3)
-            //{
-            //    // Snap
-            //    //mat4x4 matrix;
-            //    //vehicle->GetTransform(&matrix);
-            //    //matrix.rotate(180, vec3(1.0f, 0.0f, 0.0f));
-            //    //matrix.rotate(newEulerAngles.y, vec3(0.0f, 1.0f, 0.0f));
-            //    //vehicle->SetTransform(&matrix);
-
-            //    // NOT snap
-            //    btScalar x = 0;
-            //    btScalar y = 0;
-            //    btScalar z = 75;
-            //    btVector3 torque(x, y, z);
-            //    vehicle->vehicle->getRigidBody()->applyTorqueImpulse(torque);
-            //    LOG("YAY Z!");
-            //}
             if (abs(newEulerAngles.x) >= 75 && GetY() <= 3)
             {
-                // Snap
-                //mat4x4 matrix;
-                //vehicle->GetTransform(&matrix);
-                //matrix.rotate(180, vec3(1.0f, 0.0f, 0.0f));
-                //matrix.rotate(newEulerAngles.y, vec3(0.0f, 1.0f, 0.0f));
-                //vehicle->SetTransform(&matrix);
-
-                // NOT snap
                 btScalar x = 65;
                 btScalar y = 0;
                 btScalar z = 65;

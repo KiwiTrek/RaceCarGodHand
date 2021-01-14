@@ -17,6 +17,14 @@ PrimitiveTypes Primitive::GetType() const
 	return type;
 }
 
+void Primitive::Update()
+{
+	if (body != nullptr)
+	{
+		body->GetTransform(&transform);
+	}
+}
+
 // ------------------------------------------------------------
 void Primitive::Render() const
 {

@@ -101,7 +101,8 @@ public:
 	Cube c_ob_dead_3;
 
 	//Obstacles
-	PhysBody3D* sphereBody;
+	Sphere* chainCenter;
+	float force;
 
 	//Reset Car
 	mat4x4 c_matrix;

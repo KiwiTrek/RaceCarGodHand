@@ -34,6 +34,7 @@ bool ModuleSceneIntro::Start()
 
     lapCounter = -1;
     maxLaps = 3;
+    force = 25.0f;
 
     lapFx = App->audio->LoadFx("Assets/Fx/lap.wav");
 
@@ -72,8 +73,20 @@ update_status ModuleSceneIntro::Update(float dt)
         start = false;
     }
 
+    LOG("%f,%f", chainCenter->body->GetBody()->getCenterOfMassPosition().x(), chainCenter->body->GetBody()->getCenterOfMassPosition().z());
+    if (chainCenter->body->GetBody()->getCenterOfMassPosition().x() > 17.0f && chainCenter->body->GetBody()->getCenterOfMassPosition().z() > 15.0f)
+    {
+        force = -abs(force);
+    }
+    else if (chainCenter->body->GetBody()->getCenterOfMassPosition().x() < 7.0f && chainCenter->body->GetBody()->getCenterOfMassPosition().z() < 5.0f)
+    {
+        force = abs(force);
+    }
+    chainCenter->body->Push(force, 0, force);
+
     for (uint n = 0; n < c_circuit.Count(); n++)
     {
+        c_circuit[n]->Update();
         c_circuit[n]->Render();
     }
 
@@ -176,11 +189,6 @@ void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
         {
             //Go last checkpoint;
             GoLastCheckPoint();
-        }
-        else if (body1 == sphereBody)
-        {
-            float force = 30.0f;
-            body1->Push(-(App->camera->Z.x * force), -(App->camera->Z.y * force), -(App->camera->Z.z * force));
         }
     }
 }
@@ -400,95 +408,37 @@ void ModuleSceneIntro::BuildCircuit()
     ob_dead_zone_3->collision_listeners.add(this);
 
     //------ Obstacle -------------------------------
-    //Sphere s(1);
-    //s.SetPos(App->camera->Position.x, App->camera->Position.y, App->camera->Position.z);
-    //float force = 30.0f;
-    //App->physics->AddBody(s)->Push(-(App->camera->Z.x * force), -(App->camera->Z.y * force), -(App->camera->Z.z * force));
+    Sphere* chain = nullptr;
+    Sphere* pastChain = new Sphere(0.5f);
+    c_circuit.PushBack(pastChain);
+    pastChain->SetPos(12, 18.0f, 10);
+    pastChain->color = { 0.5,0.5,0.5,1 };
+    pastChain->body = App->physics->AddBody(*pastChain,0.0f);
 
-    //sph.radius = 100;
-    //sphereObstacle = App->physics->AddBody(sph, 0);
-    //sphereObstacle->SetPos(100, 100, 20);
-    //sphereObstacle->GetTransform(&sph.transform);
-    //sphereObstacle->collision_listeners.add(this);
-
-
-    Sphere* pastRope = new Sphere(0.1f);
-    c_circuit.PushBack(pastRope);
-    pastRope->SetPos(12, 13.0f, 10);
-    pastRope->color = { 1,0.5,0,1 };
-    PhysBody3D* pastRopeBody = App->physics->AddBody(*pastRope);
-    Sphere* rope;
-    float i = 13.0f;
-    while (i > 8.9f && i < 13.1f)
+    int chainL = 11;
+    float yPos = 18.0f;
+    for (int n = 0; n < chainL; n++)
     {
-        float j = i - 0.2f;
-        if (i != 13.0f)
-        {
-            pastRope = rope;
-            c_circuit.PushBack(pastRope);
-            pastRope->SetPos(12, i, 10);
-            pastRope->color = { 1,0.5,0,1 };
-            pastRopeBody = App->physics->AddBody(*pastRope);
-        }
+        chain = new Sphere(0.5f);
+        c_circuit.PushBack(chain);
+        chain->SetPos(12, yPos, 10);
+        chain->color = { 0.5,0.5,0.5,1 };
+        chain->body = App->physics->AddBody(*chain,75.0f);
+        yPos -= 1.0f;
 
-        rope = new Sphere(0.1f);
-        c_circuit.PushBack(rope);
-        rope->SetPos(12, j, 10);
-        rope->color = { 1,0.5,0,1 };
-        PhysBody3D* ropeBody = App->physics->AddBody(*rope);
 
-        App->physics->AddConstraintP2P(*pastRopeBody, *ropeBody, { 0,0,0 }, { 0,0,0 });
-
-        if (j > 8.9f && j < 9.1f)
-        {
-            pastRope = rope;
-            c_circuit.PushBack(rope);
-            rope->SetPos(12, j, 10);
-            rope->color = { 1,0.5,0,1 };
-        }
-        LOG("chain");
-        i = j;
+        App->physics->AddConstraintP2P(*pastChain->body, *chain->body, { 0,-0.5f,0 }, { 0,0.5f,0 });
+        pastChain = chain;
     }
 
     Sphere* sphereObst = new Sphere(3);
     c_circuit.PushBack(sphereObst);
-    sphereObst->SetPos(12, 6, 10);
-    sphereObst->color = { 1,0.5,0,1 };
-    sphereBody = App->physics->AddBody(*sphereObst, 50.f);
+    sphereObst->SetPos(12, 4, 10);
+    sphereObst->color = { 0,0,0,1 };
+    sphereObst->body = App->physics->AddBody(*sphereObst, 500.f);
+    chainCenter = sphereObst;
 
-    //Sphere* sphereObstAnchor = new Sphere(1);
-    //c_circuit.PushBack(sphereObstAnchor);
-    //sphereObstAnchor->SetPos(12, 10, 10);
-    //sphereObstAnchor->color = { 1,0.5,0,1 };
-    //PhysBody3D* sphereAnchorBody = App->physics->AddBody(*sphereObstAnchor);
-
-    //App->physics->AddConstraintP2P(*sphereBody, *sphereAnchorBody, { 0,0,0 }, { 0,0,0 });
-
-    //Sphere* sphereObstAnchor2 = new Sphere(1);
-    //c_circuit.PushBack(sphereObstAnchor2);
-    //sphereObstAnchor2->SetPos(12, 12, 10);
-    //sphereObstAnchor2->color = { 1,0.5,0,1 };
-    //PhysBody3D* sphereAnchorBody2 = App->physics->AddBody(*sphereObstAnchor2);
-
-    //App->physics->AddConstraintP2P(*sphereAnchorBody, *sphereAnchorBody2, { 0,0,0 }, { 0,0,0 });
-
-
-
-
-
-    //Cube* border1 = new Cube(400.0f, 500.0f, 1.0f);
-    //c_circuit.PushBack(border1);
-    //border1->SetPos(0.0f, 250.0f, 200.0f);
-    //border1->color = { 0.67f, 0.84f, 0.9f, 1.0f };
-
-    //Cylinder* c = new Cylinder(sizePilon, heightPilon);
-    //c->SetRotation(90.0f, { 0.0f,0.0f,1.0f });
-    //c_circuit.PushBack(c);
-    //c->SetPos(init.x + halfRoad, 0.f + heightPilon / 2, init.y + zPos);
-    //c->color = { 1,0.5,0,1 };
-    //App->physics->AddBody(*c, 0.0f);
-    //zPos += sizePilon + sizePilon + pilonDistance;
-
+    App->physics->AddConstraintP2P(*chain->body, *sphereObst->body, { 0,-0.5f,0 }, { 0,3.0f,0 });
 
     CreateBorders();
 }

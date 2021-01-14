@@ -120,7 +120,7 @@ update_status ModulePhysics3D::Update(float dt)
 	btVector3 yellow = { 255, 255, 0 };
 	if(debug == true)
 	{
-		/*world->debugDrawWorld();*/
+		//world->debugDrawWorld();
 
 		// Render sensors
 		p2List_item<PhysBody3D*>* itemSensor = bodies.getFirst();
@@ -148,6 +148,14 @@ update_status ModulePhysics3D::Update(float dt)
 			float force = 30.0f;
 			AddBody(s)->Push(-(App->camera->Z.x * force), -(App->camera->Z.y * force), -(App->camera->Z.z * force));
 		}
+
+		p2List_item<btTypedConstraint*>* itemConstraint = constraints.getFirst();
+		while (itemConstraint)
+		{
+			world->debugDrawConstraint(itemConstraint->data);
+			itemConstraint = itemConstraint->next;
+		}
+
 	}
 
 	p2List_item<PhysBody3D*>* itemSensor = bodies.getFirst();
