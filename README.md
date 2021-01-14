@@ -1,12 +1,9 @@
 # God Hand's Wrecking RaceCar
 ### The best racing car game ever!
-Introducing a brand new racing car experience with the Bullet Physics Engine:tm:.
-
-Avoid the menacing **Wrecking Ball** and complete 3 full laps in less than 4 minutes.
-
-Use your god-like racing skills to complete the challenge awaiting you!
-
-Will you get to the end in time?
+**Introducing a brand new racing car experience with the Bullet Physics Engine:tm:.**
+- Avoid the menacing **Wrecking Ball** and complete 3 full laps in less than 4 minutes!
+- Use your god-like racing skills to complete the challenge awaiting you!
+- Will you get to the end in time?
 
 (Link to the github project [here](https://github.com/WillyTrek19/RaceCarGodHand))
 
