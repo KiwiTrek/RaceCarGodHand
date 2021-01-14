@@ -5,6 +5,9 @@
 - Use your god-like racing skills to complete the challenge awaiting you!
 - Will you get to the end in time?
 
+![sc1](https://github.com/WillyTrek19/RaceCarGodHand/blob/main/RaceCar_GodHand/Screenshots/car2.png?raw=true)
+![sc2](https://github.com/WillyTrek19/RaceCarGodHand/blob/main/RaceCar_GodHand/Screenshots/scCar2.png?raw=true)
+
 (Link to the github project [here](https://github.com/WillyTrek19/RaceCarGodHand))
 
 ## Controls
@@ -35,3 +38,5 @@
  - Guillem Álava Burgueño ([Github](https://github.com/WillyTrek19))
  - Sergi Colomer Ferrer ([Github](https://github.com/Lladruc37))
  - Sebastian Delgado Vargas ([Github](https://github.com/Vinskky))
+ 
+ ![Logo](https://github.com/WillyTrek19/RaceCarGodHand/blob/main/RaceCar_GodHand/Screenshots/logo.png?raw=true)
