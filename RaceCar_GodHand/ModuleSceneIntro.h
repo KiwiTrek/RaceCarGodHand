@@ -100,6 +100,9 @@ public:
 	PhysBody3D* ob_dead_zone_3;
 	Cube c_ob_dead_3;
 
+	PhysBody3D* ob_dead_zone_4;
+	Cube c_ob_dead_4;
+
 	//Obstacles
 	Sphere* chainCenter;
 	float force;

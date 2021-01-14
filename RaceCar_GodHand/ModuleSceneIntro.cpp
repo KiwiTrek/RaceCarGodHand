@@ -112,6 +112,11 @@ update_status ModuleSceneIntro::Update(float dt)
         textManager.PrintTextOnMap(App->player->GetX(), App->player->GetY() + 7.0f, App->player->GetZ(), White, Font::TIMES_ROMAN_24, title);
     }
 
+    if (timer > 250.0f)
+    {
+        App->player->lose = true;
+    }
+
     if (!start && (App->player->victory || App->player->lose))
     {
         if (App->audio->HasFinished())
@@ -185,7 +190,7 @@ void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
                 check_point1->isChecked = true;
             }
         }
-        else if (body1 == dead_zone || body1 == ob_dead_zone || body1 == ob_dead_zone_2 || body1 == ob_dead_zone_3)
+        else if (body1 == dead_zone || body1 == ob_dead_zone || body1 == ob_dead_zone_2 || body1 == ob_dead_zone_3 || body1 == ob_dead_zone_4)
         {
             //Go last checkpoint;
             GoLastCheckPoint();
@@ -406,6 +411,14 @@ void ModuleSceneIntro::BuildCircuit()
     ob_dead_zone_3->SetAsSensor(true);
     ob_dead_zone_3->isDeath = true;
     ob_dead_zone_3->collision_listeners.add(this);
+
+    c_ob_dead_4.Size(110, 1, 70);
+    ob_dead_zone_4 = App->physics->AddBody(c_ob_dead_4, 0);
+    ob_dead_zone_4->SetPos(-55, 0, 60);
+    ob_dead_zone_4->GetTransform(&c_ob_dead_4.transform);
+    ob_dead_zone_4->SetAsSensor(true);
+    ob_dead_zone_4->isDeath = true;
+    ob_dead_zone_4->collision_listeners.add(this);
 
     //------ Obstacle -------------------------------
     Sphere* chain = nullptr;
