@@ -32,7 +32,7 @@ bool ModuleSceneIntro::Start()
     onceMusicIntro = true;
     onceFinished = true;
 
-    lapCounter = -1;
+    lapCounter = 0;
     maxLaps = 3;
     force = 25.0f;
 
@@ -112,7 +112,7 @@ update_status ModuleSceneIntro::Update(float dt)
         textManager.PrintTextOnMap(App->player->GetX(), App->player->GetY() + 7.0f, App->player->GetZ(), White, Font::TIMES_ROMAN_24, title);
     }
 
-    if (timer > 250.0f)
+    if (timer > 240.0f)
     {
         App->player->lose = true;
     }
@@ -166,7 +166,7 @@ void ModuleSceneIntro::OnCollision(PhysBody3D* body1, PhysBody3D* body2)
     {
         if (body1 == finish_line)
         {
-            if (lapCounter == maxLaps)
+            if (lapCounter > maxLaps)
             {
                 App->player->victory = true;
             }
